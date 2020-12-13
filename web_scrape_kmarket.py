@@ -14,7 +14,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException
-chromedriver_path = "" # Specify your Selenium ChromeDriver path here
+chromedriver_path = "" # SPECIFY YOUR SELENIUM CHROMEDRIVER PATH HERE
 current_file_path = os.path.dirname(__file__)
 
 
