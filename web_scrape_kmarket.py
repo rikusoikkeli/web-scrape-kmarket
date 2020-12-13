@@ -14,7 +14,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException
-chromedriver_path = "" # SPECIFY YOUR SELENIUM CHROMEDRIVER PATH HERE
+chromedriver_path = "C:\Omat tiedostot\Koodihommat\Misc\harjoitustyöt\selenium_project\chromedriver_win32\chromedriver.exe"
 current_file_path = os.path.dirname(__file__)
 
 
@@ -34,6 +34,7 @@ class WebScrape(object):
         self.all_categories_page = "https://www.k-ruoka.fi/kauppa/tuotteet"
         self.category_dict = {}
         self.all_items_dict = {}
+        self.current_category = None
         
     
     def getCategoryDict(self):
@@ -60,7 +61,7 @@ class WebScrape(object):
     def downloadItems(self):
         """
         Noutaa sivun tuotteiden tiedot ja kerää ne dictiin muodossa:
-            item_number : (item_name, item_price)
+            item_number : (item_category, item_name, item_price)
         """
         # jokainen tuote löytyy html-luokasta nimeltä "bundle-list-item"
         items_selenium = self.driver.find_elements_by_class_name("bundle-list-item")
@@ -71,14 +72,19 @@ class WebScrape(object):
             temp = item.find_element_by_xpath(".//div[contains(@id,'product-result')]")
             temp = temp.get_attribute("id")
             index = temp.find("item")
-            item_number = temp[index+5:]
             item_list = item.text.split("\n")
+            
+            item_number = temp[index+5:]
+            item_category = self.current_category
             item_name = item_list[0]
             item_price = item_list[-1]
             try:
                 # int(item_price[0]) palauttaa exceptionin, jos price on jotain muuta kuin numeroita
                 if int(item_price[0]) and item_price[-3:] == "/kg":
-                    self.category_dict[item_number] = (item_name, item_price[0:-3])
+                    self.category_dict[item_number] = (item_category, item_name, item_price)
+                    
+                elif int(item_price[0]) and item_price[-2:] == "/l":
+                    self.category_dict[item_number] = (item_category, item_name, item_price)
             except:
                 pass
 
@@ -94,20 +100,22 @@ class WebScrape(object):
         aList = []
         for key in self.all_items_dict:
             number = key
-            name, price = self.all_items_dict[key]
-            row = (current_time, number, name, price)
+            category, name, price = self.all_items_dict[key]
+            row = (current_time, number, category, name, price)
             aList.append(row)
-            print(row)
         
-        filename = current_time[0:-9] + "_food_data.csv"
+        filename = current_time[0:-9] + "_product_data.csv"
         folder = "data"
         relative_path = os.path.join(folder, filename)
         absolute_path = os.path.normcase(os.path.join(self.current_file_path, relative_path))
         
-        with open(absolute_path, "w") as f:
+        with open(absolute_path, "w", encoding="utf8") as f:
             csv_writer = csv.writer(f, delimiter=";")
             for row in aList:
-                csv_writer.writerow(row)
+                try:
+                    csv_writer.writerow(row)
+                except Exception as e:
+                    print(e)
 
 
     def loadAllItems(self):
@@ -156,8 +164,9 @@ class WebScrape(object):
                 categories_children = categories_children[1:] # leikataan pois "Suosittelemme"
                 
                 category = categories_children[i]
+                self.current_category = category.text
                 
-                print(f"Kategorioita jäljellä: {end_count - i}")
+                print(f"Kategorioita jäljellä: {end_count - i} / {end_count}")
                 print(f"Mennään kategoriaan: {category.text}")
                 
                 # valitaan kategoria
@@ -191,49 +200,4 @@ class WebScrape(object):
 browser = WebScrape(chromedriver_path, current_file_path)
 browser.runWebScrape()
 browser.saveData()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
