@@ -14,7 +14,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException
-chromedriver_path = "C:\Omat tiedostot\Koodihommat\Misc\harjoitustyöt\selenium_project\chromedriver_win32\chromedriver.exe"
+chromedriver_path = "COPY YOUR SELENIUM CHROMEDRIVER PATH HERE"
 current_file_path = os.path.dirname(__file__)
 
 
