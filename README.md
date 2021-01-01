@@ -4,6 +4,7 @@
 WHAT DOES THE CODE DO:
 
 This program uses Selenium to scrape all the price data from https://www.k-ruoka.fi/ and saves it locally as a CSV file.
+Can be used for statistics, price alarms etc.
 
 
 HOW TO GET THE CODE TO WORK:
